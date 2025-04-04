@@ -135,27 +135,66 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - PostgreSQL database
 - Google Chrome browser
 
-### Development Setup
+### Desktop Setup Instructions
 
-1. Clone the repository to your local machine
+1. Clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/yourusername/cyberguard.git
+   cd cyberguard
+   ```
 
-2. Install the project dependencies using npm
+2. Install project dependencies:
+   ```bash
+   npm install
+   ```
 
 3. Set up PostgreSQL database:
-   - Install PostgreSQL if not already installed
-   - Create a new database named `cyberguard`
+   - Install PostgreSQL if not already installed (https://www.postgresql.org/download/)
+   - Create a new database named `cyberguard`:
+     ```bash
+     psql -U postgres
+     CREATE DATABASE cyberguard;
+     \q
+     ```
    - Set up environment variables by creating a `.env` file in the project root:
      ```
      DATABASE_URL=postgresql://username:password@localhost:5432/cyberguard
      ```
      Replace `username` and `password` with your PostgreSQL credentials
 
-4. Push database schema using the db:push script
+4. Push database schema to your PostgreSQL database:
+   ```bash
+   npm run db:push
+   ```
 
-5. Build the project with npm build
+5. Build the project:
+   ```bash
+   npm run build
+   ```
 
-6. Start the server in development mode
-   - This will start the Express server which handles API requests from the extension.
+6. Start the server in development mode:
+   ```bash
+   npm run dev
+   ```
+   This will start both the Express backend server (which handles API requests from the extension) and the Vite development server for the frontend.
+
+### Loading the Extension in Chrome
+
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer mode" by toggling the switch in the top-right corner
+3. Click on "Load unpacked" button
+4. Navigate to the project directory and select the `client/public` folder
+5. The CyberGuard extension should now appear in your extensions list
+6. Pin the extension to your Chrome toolbar by clicking the extensions menu (puzzle piece icon) and clicking the pin icon next to CyberGuard
+   ```bash
+   npm run build
+   ```
+
+6. Start the server in development mode:
+   ```bash
+   npm run dev
+   ```
+   This will start both the Express backend server (which handles API requests from the extension) and the Vite development server for the frontend.
 
 ### Loading the Extension in Chrome
 
