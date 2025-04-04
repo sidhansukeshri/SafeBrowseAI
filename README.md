@@ -139,7 +139,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 1. Clone the repository to your local machine:
    ```bash
-   git clone https://github.com/yourusername/cyberguard.git
+   git clone https://github.com/sidhansukeshri/SafeBrowseAI.git
    cd cyberguard
    ```
 
