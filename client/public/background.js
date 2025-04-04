@@ -46,7 +46,7 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'analyzeSentiment') {
     // Forward sentiment analysis request to the API
-    fetch('http://localhost:8000/api/analyze/sentiment', {
+    fetch('http://localhost:5000/api/analyze/sentiment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   if (message.action === 'rephraseContent') {
     // Forward rephrasing request to the API
-    fetch('http://localhost:8000/api/rephrase', {
+    fetch('http://localhost:5000/api/rephrase', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

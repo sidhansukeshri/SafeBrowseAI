@@ -9,11 +9,21 @@ function App() {
 
   useEffect(() => {
     // Initialize dark mode from storage
-    chrome.storage.local.get(["darkMode"], (result) => {
-      if (result.darkMode !== undefined) {
-        setDarkMode(result.darkMode);
+    try {
+      if (window.chrome?.storage?.local) {
+        window.chrome.storage.local.get(["darkMode"])
+          .then((result: any) => {
+            if (result.darkMode !== undefined) {
+              setDarkMode(result.darkMode);
+            }
+          })
+          .catch((error: any) => {
+            console.error("Error getting dark mode setting:", error);
+          });
       }
-    });
+    } catch (error) {
+      console.error("Error accessing chrome API:", error);
+    }
   }, []);
 
   useEffect(() => {
@@ -24,7 +34,16 @@ function App() {
     }
     
     // Save dark mode preference
-    chrome.storage.local.set({ darkMode });
+    try {
+      if (window.chrome?.storage?.local) {
+        window.chrome.storage.local.set({ darkMode })
+          .catch((error: any) => {
+            console.error("Error saving dark mode setting:", error);
+          });
+      }
+    } catch (error) {
+      console.error("Error accessing chrome API:", error);
+    }
   }, [darkMode]);
 
   return (
