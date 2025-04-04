@@ -114,59 +114,138 @@ CyberGuard uses a PostgreSQL database with the following tables:
    - URL and domain information
    - Timestamp and type of detection
 
+## Contributing
+
+Contributions to CyberGuard are welcome! Here's how you can contribute:
+
+1. Fork the repository
+2. Create a new branch for your feature or bugfix
+3. Submit a pull request with a clear description of your changes
+
+Please ensure your code follows the project's coding standards and includes appropriate tests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 ## Installation and Setup
 
 ### Prerequisites
 
 - Node.js 16+ and npm
 - PostgreSQL database
+- Google Chrome browser
 
 ### Development Setup
 
-1. Clone the repository
-2. Install dependencies
-3. Set up environment variables with PostgreSQL database connection
-4. Push database schema
-5. Start the development server
-6. Load the extension in Chrome by enabling Developer mode and loading the unpacked extension
+1. Clone the repository to your local machine
 
-## Usage
+2. Install the project dependencies using npm
 
-1. Click on the CyberGuard icon in your browser toolbar to access the extension popup
-2. Use the Settings panel to adjust sensitivity levels and enable/disable features
-3. Browse websites with protection enabled - harmful content will be detected and rephrased automatically
-4. View your analysis history to review previously detected content
+3. Set up PostgreSQL database:
+   - Install PostgreSQL if not already installed
+   - Create a new database named `cyberguard`
+   - Set up environment variables by creating a `.env` file in the project root:
+     ```
+     DATABASE_URL=postgresql://username:password@localhost:5432/cyberguard
+     ```
+     Replace `username` and `password` with your PostgreSQL credentials
 
-## Technical Implementation Details
+4. Push database schema using the db:push script
 
-### Content Detection Flow
+5. Build the project with npm build
 
-1. The content script analyzes text nodes on the page
-2. Text is evaluated against offensive content patterns and sentiment analysis models
-3. Detected harmful content is sent to the server for rephrasing
-4. Rephrased content is displayed to the user and stored in the database
-5. The user can view analysis history and adjust settings as needed
+6. Start the server in development mode
+   - This will start the Express server which handles API requests from the extension.
 
-### Chrome API Integration
+### Loading the Extension in Chrome
 
-The extension uses multiple Chrome APIs:
-- `chrome.storage` for saving user settings
-- `chrome.tabs` for accessing the current tab information
-- `chrome.runtime` for communication between scripts
-- `chrome.notifications` for alerting users about detected content
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer mode" by toggling the switch in the top-right corner
+3. Click on "Load unpacked" button
+4. Navigate to the project directory and select the `client/public` folder
+5. The CyberGuard extension should now appear in your extensions list
+6. Pin the extension to your Chrome toolbar by clicking the extensions menu (puzzle piece icon) and clicking the pin icon next to CyberGuard
 
-### Error Handling
+## Testing with Real Websites
 
-The application includes comprehensive error handling throughout:
-- Graceful fallbacks when Chrome APIs are not available (in development mode)
-- Database transaction error handling with rollbacks
-- Frontend error boundaries to prevent UI crashes
-- API request error handling with appropriate user feedback
+### Enabling the Extension
 
-## Future Enhancements
+1. Click on the CyberGuard icon in your browser toolbar to open the extension popup
+2. Ensure that the following settings are enabled:
+   - Content Detection
+   - Sentiment Analysis
+   - Content Rephrasing
+   - Real-Time Scraping
+3. Adjust sensitivity settings based on your preferences
 
-- Integration with more advanced AI models for improved content detection
-- Support for additional languages beyond English
-- Image recognition for detecting inappropriate visual content
-- Browser support for Firefox and Safari
-- Enhanced analytics dashboard for insights into filtered content
+### Testing Process
+
+1. **Visit News Sites or Social Media**: Navigate to news websites or social media platforms that might contain negative content
+   - Examples: Reddit, Twitter, news comment sections, forum discussions
+   - Recommended test sites: news.ycombinator.com, reddit.com/r/politics, etc.
+
+2. **Check Extension Badge**: The extension icon might change or display a badge with the number of detected content items
+
+3. **View Analysis Results**: Click on the extension icon to see the list of detected content and how it was rephrased
+
+4. **Testing Protected Websites**: You can add specific websites to your protected list to customize detection for those domains
+
+5. **Testing with Different Sensitivity Levels**: 
+   - Try adjusting the Content Sensitivity and Sentiment Sensitivity sliders in the Settings
+   - Lower values will only catch very offensive content, while higher values will detect more subtle negative content
+
+### Troubleshooting
+
+If the extension isn't working as expected:
+
+1. **Check Server Connection**:
+   - Ensure the backend server is running
+   - Check browser console for network errors (press F12, then go to Network tab)
+
+2. **Extension Permissions**:
+   - Make sure the extension has permissions to access website content
+   - Click on "Details" for the CyberGuard extension in chrome://extensions/ and verify that "Site access" is set to "On all sites"
+
+3. **Refresh Extension**:
+   - If changes were made to the extension, click the refresh icon on the extension card in chrome://extensions/
+   - You may need to reload web pages that were already open
+
+4. **Reload Extension**:
+   - In some cases, you might need to remove the extension and load it again:
+     - Click "Remove" on the CyberGuard extension card
+     - Click "Load unpacked" and select the client/public folder again
+## Communication Between Extension and Backend
+
+The CyberGuard extension communicates with the backend server in the following ways:
+
+1. **Content Analysis**: When the extension detects potentially harmful content, it sends the text to the server for advanced sentiment analysis and rephrasing.
+
+2. **Settings Synchronization**: User settings are stored in both the Chrome storage API and the PostgreSQL database for persistence across different devices.
+
+3. **Protected Websites**: The list of protected websites and their specific protection settings are synchronized between the client and server.
+
+4. **Analysis Results**: Results of content analysis are stored in the database and can be retrieved by the extension for display in the UI.
+
+### API Endpoints
+
+The server exposes the following main API endpoints:
+
+- `POST /api/analyze/sentiment`: Analyzes the sentiment of provided text
+- `POST /api/rephrase`: Rephrases negative content to be more positive or neutral
+- Various endpoints for managing user settings, protected websites, and analysis results
+
+### Testing the API
+
+You can test the API endpoints using curl commands, for example:
+
+```bash
+# Test sentiment analysis
+curl -X POST http://localhost:3000/api/analyze/sentiment \
+  -H "Content-Type: application/json" \
+  -d '{"text": "I hate this website, it's terrible and useless", "threshold": 0.5}'
+
+# Test content rephrasing
+curl -X POST http://localhost:3000/api/rephrase \
+  -H "Content-Type: application/json" \
+  -d '{"text": "This article is garbage and completely wrong", "type": "negative"}'
+```
