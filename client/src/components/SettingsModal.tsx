@@ -17,18 +17,47 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
   useEffect(() => {
     // Load protected websites from storage
-    chrome.storage.local.get(["protectedWebsites"], (data) => {
-      if (data.protectedWebsites && Array.isArray(data.protectedWebsites)) {
-        setWebsites(data.protectedWebsites);
+    try {
+      if (window.chrome?.storage?.local) {
+        window.chrome.storage.local.get(["protectedWebsites"])
+          .then((data: any) => {
+            if (data.protectedWebsites && Array.isArray(data.protectedWebsites)) {
+              setWebsites(data.protectedWebsites);
+            } else {
+              // Default websites if none found
+              setWebsites([
+                { domain: "reddit.com", features: "All Features" },
+                { domain: "twitter.com", features: "All Features" },
+                { domain: "news.example.com", features: "Custom" }
+              ]);
+            }
+          })
+          .catch((error: any) => {
+            console.error("Error loading protected websites:", error);
+            // Set defaults on error
+            setWebsites([
+              { domain: "reddit.com", features: "All Features" },
+              { domain: "twitter.com", features: "All Features" },
+              { domain: "news.example.com", features: "Custom" }
+            ]);
+          });
       } else {
-        // Default websites if none found
+        // Set defaults if chrome API is not available
         setWebsites([
           { domain: "reddit.com", features: "All Features" },
           { domain: "twitter.com", features: "All Features" },
           { domain: "news.example.com", features: "Custom" }
         ]);
       }
-    });
+    } catch (error) {
+      console.error("Error accessing chrome API:", error);
+      // Set defaults on error
+      setWebsites([
+        { domain: "reddit.com", features: "All Features" },
+        { domain: "twitter.com", features: "All Features" },
+        { domain: "news.example.com", features: "Custom" }
+      ]);
+    }
   }, []);
 
   const handleSensitivityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +86,16 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     updateSettings(localSettings);
     
     // Save websites to storage
-    chrome.storage.local.set({ protectedWebsites: websites });
+    try {
+      if (window.chrome?.storage?.local) {
+        window.chrome.storage.local.set({ protectedWebsites: websites })
+          .catch((error: any) => {
+            console.error("Error saving protected websites:", error);
+          });
+      }
+    } catch (error) {
+      console.error("Error accessing chrome API:", error);
+    }
     
     toast({
       title: "Settings saved",
